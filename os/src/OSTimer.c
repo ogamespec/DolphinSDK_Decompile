@@ -3,7 +3,7 @@ undefined4 OSSetTimerCallback(undefined4 param_1)
   undefined4 uVar1;
   
   if (Timer._20_4_ == 0) {
-    OSPanic(...data.0,0x7f,@3);
+    OSPanic(...data.0,0x7f,"OSSetTimerCallback(): timer is not initialized.");
   }
   uVar1 = Timer._0_4_;
   Timer._16_4_ = 1;
@@ -14,7 +14,7 @@ undefined4 OSSetTimerCallback(undefined4 param_1)
 void OSInitTimer(uint param_1,undefined2 param_2)
 {
   if (0x7fffffff < param_1) {
-    OSPanic(...data.0,0x97,@7);
+    OSPanic(...data.0,0x97,"OSInitTimer(): time param must be less than 0x80000000.");
   }
   Timer._16_4_ = 1;
   Timer._4_4_ = param_1;
@@ -24,7 +24,7 @@ void OSInitTimer(uint param_1,undefined2 param_2)
     __OSSetExceptionHandler(8,DecrementerExceptionHandler);
     Timer._20_4_ = 1;
     Timer._0_4_ = 0;
-    OSReport(@8);
+    OSReport("Timer initialized\n");
   }
   return;
 }
@@ -34,7 +34,7 @@ void OSStartTimer(void)
   undefined4 uVar1;
   
   if (Timer._20_4_ == 0) {
-    OSPanic(...data.0,0xb8,@10);
+    OSPanic(...data.0,0xb8,"OSStartTimer(): timer is not initialized.");
   }
   uVar1 = OSDisableInterrupts();
   PPCMtdec(Timer._4_4_);
@@ -48,7 +48,7 @@ void OSStopTimer(void)
   undefined4 uVar1;
   
   if (Timer._20_4_ == 0) {
-    OSPanic(...data.0,0xd0,@16);
+    OSPanic(...data.0,0xd0,"OSStopTimer(): timer is not initialized.");
   }
   uVar1 = OSDisableInterrupts();
   if (Timer._16_4_ == 0) {

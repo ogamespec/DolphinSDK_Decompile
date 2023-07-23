@@ -1,10 +1,10 @@
 uint OSGetArenaHi(void)
 {
   if (__OSArenaLo == 0xffffffff) {
-    OSPanic(...data.0,0x37,@3);
+    OSPanic(...data.0,0x37,"OSGetArenaHi(): OSInit() must be called in advance.");
   }
   if (__OSArenaHi < __OSArenaLo) {
-    OSPanic(...data.0,0x39,@4);
+    OSPanic(...data.0,0x39,"OSGetArenaHi(): invalid arena (hi < lo).");
   }
   return __OSArenaHi;
 }
@@ -12,10 +12,10 @@ uint OSGetArenaHi(void)
 uint OSGetArenaLo(void)
 {
   if (__OSArenaLo == 0xffffffff) {
-    OSPanic(...data.0,0x49,@6);
+    OSPanic(...data.0,0x49,"OSGetArenaLo(): OSInit() must be called in advance.");
   }
   if (__OSArenaHi < __OSArenaLo) {
-    OSPanic(...data.0,0x4b,@7);
+    OSPanic(...data.0,0x4b,"OSGetArenaLo(): invalid arena (hi < lo).");
   }
   return __OSArenaLo;
 }

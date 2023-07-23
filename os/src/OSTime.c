@@ -1,17 +1,43 @@
-void OSGetTime(void)
+                             //
+                             // .text 
+                             // SHT_PROGBITS  [0x0 - 0xaab]
+                             // ram:00010000-ram:00010aab
+                             //
+                             **************************************************************
+                             *                          FUNCTION                          *
+                             **************************************************************
+                             undefined OSGetTime()
+             undefined         r3:1           <RETURN>
+                             OSGetTime                                       XREF[5]:     Entry Point(*), 00010010(j), 
+                                                                                          __OSSetTime:0001005c(c), 
+                                                                                          __OSGetSystemTime:000100cc(c), 
+                                                                                          _elfSectionHeaders::00000034(*)  
+        00010000 7c 6d 42 e6     mftb       r3,TBUr
+        00010004 7c 8c 42 e6     mftb       r4,TBLr
+        00010008 7c ad 42 e6     mftb       r5,TBUr
+        0001000c 7c 03 28 00     cmpw       r3,r5
+        00010010 40 82 ff f0     bne        OSGetTime
+        00010014 4e 80 00 20     blr
+
+asm uint32_t OSGetTick ()
 {
-  return;
+  nofralloc;
+  mftb r3, TBL;
+  blr;
 }
 
-void OSGetTick(void)
-{
-  return;
-}
+                             **************************************************************
+                             *                          FUNCTION                          *
+                             **************************************************************
+                             undefined __SetTime()
+             undefined         r3:1           <RETURN>
+                             __SetTime                                       XREF[1]:     __OSSetTime:00010088(c)  
+        00010020 38 a0 00 00     li         r5,0x0
+        00010024 7c bc 43 a6     mtspr      TBLw,r5
+        00010028 7c 7d 43 a6     mtspr      TBUw,r3
+        0001002c 7c 9c 43 a6     mtspr      TBLw,r4
+        00010030 4e 80 00 20     blr
 
-void __SetTime(void)
-{
-  return;
-}
 
 void __OSSetTime(int param_1,uint param_2)
 {
@@ -99,7 +125,7 @@ int GetLeapDays(int param_1)
   int iVar2;
   
   if (param_1 < 0) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x11e,@11);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x11e,"Failed assertion 0 <= year");
   }
   if (param_1 < 1) {
     iVar2 = 0;
@@ -121,7 +147,7 @@ void GetDates(int param_1,int param_2)
   
   puVar3 = YearDays;
   if (param_1 < 0) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x137,@23);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x137,"Failed assertion 0 <= days");
   }
   *(int *)(param_2 + 0x18) = (param_1 + 6) % 7;
   iVar2 = param_1 / 0x16d;
@@ -169,7 +195,7 @@ void OSTicksToCalendarTime(int param_1,uint param_2,int *param_3)
     uVar1 = _DAT_800000f8 >> 2;
     lVar8 = lVar6 + (ulonglong)uVar1;
     if ((uVar2 + CARRY4((uint)lVar6,uVar1) ^ 0x80000000) < 0x80000000) {
-      OSPanic(s_OOSTime.c_00010b0f + 1,0x164,@29);
+      OSPanic(s_OOSTime.c_00010b0f + 1,0x164,"Failed assertion 0 <= d");
       lVar8 = lVar6 + (ulonglong)uVar1;
     }
   }
@@ -182,16 +208,16 @@ void OSTicksToCalendarTime(int param_1,uint param_2,int *param_3)
   __mod2i((int)((ulonglong)uVar7 >> 0x20),(int)uVar7,0,1000);
   param_3[8] = extraout_r4_00;
   if (param_3[9] < 0) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x168,@30);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x168,"Failed assertion 0 <= td->usec");
   }
   if (param_3[8] < 0) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x169,@31);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x169,"Failed assertion 0 <= td->msec");
   }
   iVar4 = param_2 - uVar2;
   param_1 = param_1 - (iVar5 + (uint)(param_2 < uVar2));
   lVar8 = __mod2i(param_1,iVar4,0,_DAT_800000f8 >> 2);
   if (lVar8 != 0) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x16c,@32);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x16c,"Failed assertion ticks % OSSecondsToTicks(1) == 0");
   }
   uVar7 = __div2i(param_1,iVar4,0,_DAT_800000f8 >> 2);
   uVar7 = __div2i((int)((ulonglong)uVar7 >> 0x20),(int)uVar7,0,0x15180);
@@ -203,7 +229,7 @@ void OSTicksToCalendarTime(int param_1,uint param_2,int *param_3)
     if (uVar2 < 0x80000001 && (uint)(0x7fffffff < (uint)(lVar8 + 0xb2575)) <= 0x80000000 - uVar2)
     goto LAB_00010704;
   }
-  OSPanic(s_OOSTime.c_00010b0f + 1,0x170,@33);
+  OSPanic(s_OOSTime.c_00010b0f + 1,0x170,"Failed assertion 0 <= OSTicksToSeconds(ticks) / 86400 + BIAS && OSTicksToSeconds(ticks) / 86400 + BIAS <= INT_MAX");
 LAB_00010704:
   uVar7 = __div2i(param_1,iVar4,0,_DAT_800000f8 >> 2);
   __div2i((int)((ulonglong)uVar7 >> 0x20),(int)uVar7,0,0x15180);
@@ -215,7 +241,7 @@ LAB_00010704:
     iVar3 = extraout_r4_01 + 0xb2574;
     iVar5 = extraout_r4_02 + 0x15180;
     if (iVar5 < 0) {
-      OSPanic(s_OOSTime.c_00010b0f + 1,0x177,@34);
+      OSPanic(s_OOSTime.c_00010b0f + 1,0x177,"Failed assertion 0 <= secs");
     }
   }
   GetDates(iVar3,param_3);
@@ -253,7 +279,7 @@ longlong OSCalendarTimeToTicks(uint *param_1)
   }
   if (((0 < iVar16) || ((int)(param_1[5] + iVar16) < 0)) &&
      ((iVar16 < 1 || (0x7fffffff - iVar16 < (int)param_1[5])))) {
-    OSPanic(s_OOSTime.c_00010b0f + 1,0x19c,@38);
+    OSPanic(s_OOSTime.c_00010b0f + 1,0x19c,"Failed assertion (ov_mon <= 0 && 0 <= td->year + ov_mon) || (0 < ov_mon && td->year <= INT_MAX - ov_mon)");
   }
   uVar14 = param_1[5] + iVar16;
   iVar15 = GetYearDays(uVar14,iVar15);
